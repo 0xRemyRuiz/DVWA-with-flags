@@ -20,6 +20,12 @@ COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 COPY --chown=www-data:www-data . .
 COPY --chown=www-data:www-data config/config.inc.php.dist config/config.inc.php
 
+# HackTheBox-style flags: regenerated on every container start by the entrypoint.
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["apache2-foreground"]
+
 # This is configuring the stuff for the API
 RUN cd /var/www/html/vulnerabilities/api \
  && composer install \

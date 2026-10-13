@@ -57,12 +57,20 @@ $baseUrl = 'http://'.$_SERVER[ 'SERVER_NAME' ].$_SERVER[ 'PHP_SELF' ];
 $stripPos = strpos( $baseUrl, 'dvwa/setup.php' );
 $baseUrl = substr( $baseUrl, 0, $stripPos ).'dvwa/hackable/users/';
 
+// DVWA-with-flags: passwords are randomized per deployment by the container
+// entrypoint (exported as env vars); falls back to the stock passwords when unset.
+$pw_admin   = getenv('DVWA_PASS_ADMIN')   ?: 'password';
+$pw_gordonb = getenv('DVWA_PASS_GORDONB') ?: 'abc123';
+$pw_1337    = getenv('DVWA_PASS_1337')    ?: 'charley';
+$pw_pablo   = getenv('DVWA_PASS_PABLO')   ?: 'letmein';
+$pw_smithy  = getenv('DVWA_PASS_SMITHY')  ?: 'password';
+
 $insert = "INSERT INTO users VALUES
-	('1','admin','admin','admin',MD5('password'),'{$baseUrl}admin.jpg'),
-	('2','Gordon','Brown','gordonb',MD5('abc123'),'{$baseUrl}gordonb.jpg'),
-	('3','Hack','Me','1337',MD5('charley'),'{$baseUrl}1337.jpg'),
-	('4','Pablo','Picasso','pablo',MD5('letmein'),'{$baseUrl}pablo.jpg'),
-	('5','bob','smith','smithy',MD5('password'),'{$baseUrl}smithy.jpg');";
+	('1','admin','admin','admin',MD5('{$pw_admin}'),'{$baseUrl}admin.jpg'),
+	('2','Gordon','Brown','gordonb',MD5('{$pw_gordonb}'),'{$baseUrl}gordonb.jpg'),
+	('3','Hack','Me','1337',MD5('{$pw_1337}'),'{$baseUrl}1337.jpg'),
+	('4','Pablo','Picasso','pablo',MD5('{$pw_pablo}'),'{$baseUrl}pablo.jpg'),
+	('5','bob','smith','smithy',MD5('{$pw_smithy}'),'{$baseUrl}smithy.jpg');";
 if( !pg_query( $insert ) ) {
 	dvwaMessagePush( "Data could not be inserted into 'users' table<br />SQL: " . pg_last_error() );
 	dvwaPageReload();

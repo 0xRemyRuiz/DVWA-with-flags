@@ -9,9 +9,9 @@ networks:
 services:
   dvwa:
     build: .
-    image: ghcr.io/digininja/dvwa:latest
-    # Change `always` to `build` to build from local source
-    pull_policy: always
+    image: dvwa-with-flags:latest
+    # Build from local source so the flag entrypoint is included
+    pull_policy: build
     environment:
       - DB_SERVER=db
     depends_on:
@@ -22,7 +22,7 @@ services:
     networks:
       - dvwa
     ports:
-      - 127.0.0.1:4280:80
+      - 127.0.0.1:8383:8383
     restart: unless-stopped
 
   db:

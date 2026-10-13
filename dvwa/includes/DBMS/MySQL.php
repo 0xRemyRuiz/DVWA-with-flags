@@ -51,12 +51,22 @@ dvwaMessagePush( "'users' table was created." );
 $base_dir= str_replace ("setup.php", "", $_SERVER['SCRIPT_NAME']);
 $avatarUrl  = $base_dir . 'hackable/users/';
 
+// DVWA-with-flags: user passwords are randomized per deployment by the
+// container entrypoint, which exports them as environment variables so the
+// stored MD5 hashes are not the well-known defaults. Falls back to the stock
+// passwords when the vars are unset (e.g. running outside the container).
+$pw_admin   = getenv('DVWA_PASS_ADMIN')   ?: 'password';
+$pw_gordonb = getenv('DVWA_PASS_GORDONB') ?: 'abc123';
+$pw_1337    = getenv('DVWA_PASS_1337')    ?: 'charley';
+$pw_pablo   = getenv('DVWA_PASS_PABLO')   ?: 'letmein';
+$pw_smithy  = getenv('DVWA_PASS_SMITHY')  ?: 'password';
+
 $insert = "INSERT INTO users (user_id, first_name, last_name, user, password, avatar, last_login, failed_login) VALUES
-	('1','admin','admin','admin',MD5('password'),'{$avatarUrl}admin.jpg', NOW(), '0'),
-	('2','Gordon','Brown','gordonb',MD5('abc123'),'{$avatarUrl}gordonb.jpg', NOW(), '0'),
-	('3','Hack','Me','1337',MD5('charley'),'{$avatarUrl}1337.jpg', NOW(), '0'),
-	('4','Pablo','Picasso','pablo',MD5('letmein'),'{$avatarUrl}pablo.jpg', NOW(), '0'),
-	('5','Bob','Smith','smithy',MD5('password'),'{$avatarUrl}smithy.jpg', NOW(), '0');";
+	('1','admin','admin','admin',MD5('{$pw_admin}'),'{$avatarUrl}admin.jpg', NOW(), '0'),
+	('2','Gordon','Brown','gordonb',MD5('{$pw_gordonb}'),'{$avatarUrl}gordonb.jpg', NOW(), '0'),
+	('3','Hack','Me','1337',MD5('{$pw_1337}'),'{$avatarUrl}1337.jpg', NOW(), '0'),
+	('4','Pablo','Picasso','pablo',MD5('{$pw_pablo}'),'{$avatarUrl}pablo.jpg', NOW(), '0'),
+	('5','Bob','Smith','smithy',MD5('{$pw_smithy}'),'{$avatarUrl}smithy.jpg', NOW(), '0');";
 if( !mysqli_query($GLOBALS["___mysqli_ston"],  $insert ) ) {
 	dvwaMessagePush( "Data could not be inserted into 'users' table<br />SQL: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) );
 	dvwaPageReload();
