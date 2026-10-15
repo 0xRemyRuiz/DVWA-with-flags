@@ -1,6 +1,7 @@
 # PWN instructions
 ## This is a short walkthrough to get both flags using command injection page
 
+# EASY01 >
 First, using user:user as credentials
 Then browse to /vulnerabilities/exec/
 
@@ -59,3 +60,13 @@ Alternatively you can get it one shot from the web input without the listener us
 ```
 ip=127.0.0.1; /bin/bash -pc 'cat /root/root.txt'
 ```
+# TEST01 >
+First, using user:user as credentials you log into the site then browse to /vulnerabilities/exec/
+
+Exploit the input and to display user flag situated at "/var/www/user.txt".
+
+Find your way to have privilege escalation and gain root.
+
+Recon priv methods and find a way to display root flag situated at "/root/root.txt".
+
+I seek only those two flags.
