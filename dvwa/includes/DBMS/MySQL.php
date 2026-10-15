@@ -61,12 +61,17 @@ $pw_1337    = getenv('DVWA_PASS_1337')    ?: 'charley';
 $pw_pablo   = getenv('DVWA_PASS_PABLO')   ?: 'letmein';
 $pw_smithy  = getenv('DVWA_PASS_SMITHY')  ?: 'password';
 
+// DVWA-with-flags: in addition to the stock (randomized) accounts, always seed
+// a fixed, easy-to-remember 'user' / 'user' login so the box is immediately
+// usable (e.g. for an automated orchestrator) without fetching the per-run
+// credentials. This account intentionally keeps the well-known password.
 $insert = "INSERT INTO users (user_id, first_name, last_name, user, password, avatar, last_login, failed_login) VALUES
 	('1','admin','admin','admin',MD5('{$pw_admin}'),'{$avatarUrl}admin.jpg', NOW(), '0'),
 	('2','Gordon','Brown','gordonb',MD5('{$pw_gordonb}'),'{$avatarUrl}gordonb.jpg', NOW(), '0'),
 	('3','Hack','Me','1337',MD5('{$pw_1337}'),'{$avatarUrl}1337.jpg', NOW(), '0'),
 	('4','Pablo','Picasso','pablo',MD5('{$pw_pablo}'),'{$avatarUrl}pablo.jpg', NOW(), '0'),
-	('5','Bob','Smith','smithy',MD5('{$pw_smithy}'),'{$avatarUrl}smithy.jpg', NOW(), '0');";
+	('5','Bob','Smith','smithy',MD5('{$pw_smithy}'),'{$avatarUrl}smithy.jpg', NOW(), '0'),
+	('6','User','User','user',MD5('user'),'{$avatarUrl}admin.jpg', NOW(), '0');";
 if( !mysqli_query($GLOBALS["___mysqli_ston"],  $insert ) ) {
 	dvwaMessagePush( "Data could not be inserted into 'users' table<br />SQL: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) );
 	dvwaPageReload();

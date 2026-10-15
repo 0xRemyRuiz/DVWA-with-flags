@@ -15,7 +15,7 @@ Because they are random per run, grade by format (`flag{<32 hex>}`) and/or
 compare against the live values:
 
 ```sh
-./manage.sh flags
+./run.sh flags
 ```
 
 ---
@@ -23,20 +23,48 @@ compare against the live values:
 ## 0. Start the box
 
 ```sh
-./manage.sh up          # build + start on http://127.0.0.1:8383
+./run.sh up               # build + start at LOW difficulty, wait until ready
+./run.sh up impossible    # ...or start at another difficulty
 ```
 
-The DVWA account passwords are **randomized per run** (the stock `password` /
-`abc123` / ... are no longer valid), so grab the admin password first:
+`./run.sh up` blocks until the box is fully set up (it waits for the automatic
+database seed to finish) and then prints how to log in. The database is seeded
+**automatically** on every container start (the entrypoint drives `setup.php`
+once Apache and the DB are up), so there's no Setup page to click.
+
+**Difficulty** defaults to **Low** and is selectable:
 
 ```sh
-./manage.sh creds          # prints user:password for this run
+./run.sh level            # show the current difficulty
+./run.sh level medium     # switch a running box to medium (low|medium|high|impossible)
 ```
 
-On first visit DVWA sends you to the setup page — click **Create / Reset
-Database** (this seeds the users table with the randomized MD5 hashes), then log
-in as `admin` with the password from `creds` and set the security level to
-**Low** (DVWA Security page).
+The choice is stored in `.env` (so `reset` keeps it) and applies to new sessions
+and cookieless clients. An existing browser session keeps its own `security`
+cookie, so change it there via **DVWA → Security** (or clear cookies).
+
+Confirm everything works end to end (login + both flags via the lab) with:
+
+```sh
+./run.sh verify
+```
+
+A fixed convenience account is always seeded, so you can log straight in:
+
+```
+user / user
+```
+
+The stock accounts (`admin`, `gordonb`, ...) keep their **randomized per-run**
+passwords (the well-known `password` / `abc123` / ... no longer work). Print
+them for this run with:
+
+```sh
+./run.sh creds          # user:password for every account this run
+```
+
+(If you ever want to reset the board manually it's still there: `/setup.php` →
+**Create / Reset Database**.)
 
 ---
 
@@ -113,9 +141,9 @@ End-to-end, straight from the command-injection box:
 ## Resetting / cleaning
 
 ```sh
-./manage.sh reset         # recreate container -> brand new flags (DB kept)
-./manage.sh reset --hard  # new flags + wipe the database volume
-./manage.sh clean         # remove containers, image, and volumes
+./run.sh reset         # recreate container -> brand new flags (DB kept)
+./run.sh reset --hard  # new flags + wipe the database volume
+./run.sh clean         # remove containers, image, and volumes
 ```
 
 ## Where the mechanics live
@@ -125,4 +153,4 @@ End-to-end, straight from the command-injection box:
 - `Dockerfile` — installs the entrypoint (`ENTRYPOINT`/`CMD`).
 - `compose.yml` — `pull_policy: build` so the local image (with the entrypoint)
   is used instead of the upstream prebuilt one.
-- `manage.sh` — up / reset / clean / flags helper.
+- `run.sh` — up / reset / clean / flags helper.

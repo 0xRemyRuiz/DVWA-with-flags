@@ -3,6 +3,9 @@
 config/config.inc.php.bak
 config/config.inc.php
 
+# Local runtime settings written by run.sh (e.g. DVWA_SECURITY_LEVEL)
+.env
+
 # Vim swap files
 .*swp
 

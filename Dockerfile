@@ -9,7 +9,7 @@ WORKDIR /var/www/html
 # https://www.php.net/manual/en/image.installation.php
 RUN apt-get update \
  && export DEBIAN_FRONTEND=noninteractive \
- && apt-get install -y zlib1g-dev libpng-dev libjpeg-dev libfreetype6-dev iputils-ping git zip unzip 7zip  \
+ && apt-get install -y zlib1g-dev libpng-dev libjpeg-dev libfreetype6-dev iputils-ping git zip unzip 7zip curl  \
  && apt-get clean -y && rm -rf /var/lib/apt/lists/* \
  && docker-php-ext-configure gd --with-jpeg --with-freetype \
  && a2enmod rewrite \
@@ -28,4 +28,4 @@ CMD ["apache2-foreground"]
 
 # This is configuring the stuff for the API
 RUN cd /var/www/html/vulnerabilities/api \
- && composer install \
+ && composer install

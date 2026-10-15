@@ -205,9 +205,17 @@ function dvwaSecurityLevelGet() {
 		return $_COOKIE[ 'security' ];
 	}
 
-	// If not, check to see if authentication is disabled, if it is, use
-	// the default security level.
-	if (array_key_exists("disable_authentication", $_DVWA) && $_DVWA['disable_authentication']) {
+	// DVWA-with-flags: with no security cookie yet (the very first request, or
+	// any API/CLI client that doesn't carry cookies - e.g. an automated
+	// exploitation orchestrator), fall back to the configured default level
+	// instead of hard-coding 'impossible'. This makes DEFAULT_SECURITY_LEVEL=low
+	// genuinely apply everywhere so the labs are exploitable out of the box.
+	// (On a stock DVWA this default is 'impossible', so behaviour is unchanged
+	// there; it only lowers the level when an operator explicitly configures a
+	// lower default.) disable_authentication keeps using the default too.
+	$valid_levels = array( 'low', 'medium', 'high', 'impossible' );
+	if (array_key_exists( 'default_security_level', $_DVWA )
+		&& in_array( $_DVWA[ 'default_security_level' ], $valid_levels, true )) {
 		return $_DVWA[ 'default_security_level' ];
 	}
 

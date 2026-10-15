@@ -14,6 +14,11 @@ services:
     pull_policy: build
     environment:
       - DB_SERVER=db
+      # Default security level for new sessions and cookieless clients. Managed
+      # by run.sh via DVWA_SECURITY_LEVEL (stored in .env); defaults to "low"
+      # instead of DVWA's stock "impossible". Change it with:
+      #   ./run.sh level <low|medium|high|impossible>   (or ./run.sh up <level>)
+      - DEFAULT_SECURITY_LEVEL=${DVWA_SECURITY_LEVEL:-low}
     depends_on:
       - db
     # Uncomment the next 2 lines to serve local source
@@ -22,7 +27,10 @@ services:
     networks:
       - dvwa
     ports:
-      - 127.0.0.1:8383:80
+      # Bind on all interfaces (not just the host loopback) so containers on
+      # other Docker networks — e.g. the kali attack box in auto-web-challenge —
+      # and the LAN can reach the target via the Docker host's IP:8383.
+      - 0.0.0.0:8383:80
     restart: unless-stopped
 
   db:
